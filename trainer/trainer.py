@@ -12,7 +12,7 @@ import os
 import re
 import time
 from pathlib import Path
-from typing import Dict, Any, Optional, Union, List
+from typing import Dict, Any, Optional, Union, List, Tuple, Callable
 import numpy as np
 import torch
 import torch.nn as nn
