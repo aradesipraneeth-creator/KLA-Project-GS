@@ -545,28 +545,29 @@ class Trainer:
         psnr_list = []
         ssim_list = []
 
-        for batch in self.val_loader:
-            lq = batch["lq"]
-            gt = batch["gt"]
+        with torch.inference_mode():
+            for batch in self.val_loader:
+                lq = batch["lq"].to(self.device, non_blocking=True)
+                gt = batch["gt"].to(self.device, non_blocking=True)
 
-            # Denormalize to original domain
-            lq_raw = denormalize(lq)
-            gt_raw = denormalize(gt)
+                # Denormalize to original domain
+                lq_raw = denormalize(lq)
+                gt_raw = denormalize(gt)
 
-            bicubic_raw = F.interpolate(
-                lq_raw, scale_factor=2, mode="bicubic", align_corners=False
-            )
+                bicubic_raw = F.interpolate(
+                    lq_raw, scale_factor=2, mode="bicubic", align_corners=False
+                )
 
-            for b in range(lq_raw.shape[0]):
-                b_img = bicubic_raw[b : b + 1]
-                g_img = gt_raw[b : b + 1]
-                dr = max(0.1, (g_img.max() - g_img.min()).item())
+                for b in range(lq_raw.shape[0]):
+                    b_img = bicubic_raw[b : b + 1]
+                    g_img = gt_raw[b : b + 1]
+                    dr = max(0.1, (g_img.max() - g_img.min()).item())
 
-                psnr = calculate_psnr(b_img, g_img, data_range=dr)
-                ssim = calculate_ssim(b_img, g_img, data_range=dr)
+                    psnr = calculate_psnr(b_img, g_img, data_range=dr)
+                    ssim = calculate_ssim(b_img, g_img, data_range=dr)
 
-                psnr_list.append(psnr)
-                ssim_list.append(ssim)
+                    psnr_list.append(psnr)
+                    ssim_list.append(ssim)
 
         bic_psnr = float(np.mean(psnr_list))
         bic_ssim = float(np.mean(ssim_list))
