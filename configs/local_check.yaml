@@ -1,0 +1,56 @@
+# KLA Semiconductor Image Restoration — Local Smoke Check Configuration
+# ONLY for imports, shape verification, one forward/backward, and checkpoint sanity.
+# DO NOT USE FOR ACTUAL TRAINING.
+project_name: "KLA_Local_Check"
+model_version: "KLA-HYBRID-V2"
+device: "cpu"
+amp: false
+use_ema: true
+ema_decay: 0.999
+
+output_dir: "./outputs/v2_local_check"
+checkpoint_dir: "./outputs/v2_local_check/checkpoints"
+val_results_dir: "./outputs/v2_local_check/results"
+visual_diagnostics_dir: "./outputs/v2_local_check/visual_diagnostics"
+
+data:
+  lq_train_dir: null
+  gt_train_dir: null
+  lq_test_dir: null
+  val_ratio: 0.1
+  seed: 42
+  batch_size: 2
+  num_workers: 0
+  patch_size_lq: null
+  cache_in_memory: false
+
+model:
+  in_channels: 1
+  out_channels: 1
+  scale: 2
+  base_dim: 16       # Lightweight for instant local CPU smoke verification
+  num_groups: 2
+  naf_blocks_per_group: 2
+  swin_blocks_per_group: 2
+  window_size: 8
+  swin_heads: 2
+  naf_expansion: 2
+  drop_path_rate: 0.0
+  use_frequency_guidance: false
+
+loss:
+  weight_charbonnier: 0.60
+  weight_ssim: 0.25
+  weight_fft: 0.15
+  charbonnier_eps: 1.0e-3
+  ssim_window_size: 11
+
+train:
+  epochs: 1
+  lr: 2.0e-4
+  min_lr: 1.0e-6
+  warmup_epochs: 0
+  val_interval: 1
+  weight_decay: 1.0e-4
+  gradient_accumulation: 1
+  clip_grad: 1.0

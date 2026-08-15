@@ -1,0 +1,50 @@
+# KLA Semiconductor Image Restoration Base Configuration (Remote GPU & Local Baseline)
+project_name: "KLA_Semiconductor_Restoration"
+device: "cuda"
+amp: true
+use_ema: true
+ema_decay: 0.999
+
+output_dir: "./results"
+checkpoint_dir: "./checkpoints"
+val_results_dir: "./validation_results"
+
+data:
+  lq_train_dir: null  # Auto-resolved (handles Train/train, NoisyLR/Noisy_LR)
+  gt_train_dir: null  # Auto-resolved (handles Train/train, GT/gt)
+  lq_test_dir: null   # Auto-resolved (handles Test_NoisyLR/NoisyLR)
+  val_ratio: 0.1
+  seed: 42
+  batch_size: 64      # High GPU throughput (only 45 batches/epoch)
+  num_workers: 4
+  patch_size_lq: null  # Full 128x128 image training
+  cache_in_memory: true # Pre-loads ~1GB data into RAM for 0ms disk I/O
+
+model:
+  in_channels: 1
+  out_channels: 1
+  num_channels: 48
+  num_groups: 6
+  num_naf_per_group: 6
+  num_swin_per_group: 2
+  window_size: 8
+  num_heads: 4
+  drop_path_rate: 0.0
+  use_frequency_guidance: false
+
+loss:
+  weight_charbonnier: 0.60
+  weight_ssim: 0.25
+  weight_fft: 0.15
+  charbonnier_eps: 1.0e-3
+  ssim_window_size: 11
+
+train:
+  epochs: 20
+  lr: 2.0e-4
+  min_lr: 1.0e-6
+  warmup_epochs: 2
+  val_interval: 5      # Fast validation every 5 epochs + final epoch
+  weight_decay: 1.0e-4
+  gradient_accumulation: 1
+  clip_grad: 1.0

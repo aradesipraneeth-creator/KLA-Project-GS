@@ -1,0 +1,44 @@
+# KLA Fast CPU Smoke Test Development Configuration
+project_name: "KLA_Dev_Smoke_Test"
+device: "cpu"
+amp: false
+use_ema: true
+ema_decay: 0.99
+
+output_dir: "./results_dev"
+checkpoint_dir: "./checkpoints"
+val_results_dir: "./validation_results_dev"
+
+data:
+  lq_train_dir: null  # Auto-resolved
+  gt_train_dir: null  # Auto-resolved
+  lq_test_dir: null   # Auto-resolved
+  val_ratio: 0.1
+  seed: 42
+  batch_size: 2
+  num_workers: 0
+
+model:
+  in_channels: 1
+  out_channels: 1
+  num_channels_dev: 24
+  num_groups_dev: 2
+  num_naf_dev: 2
+  num_swin_dev: 2
+  window_size: 8
+  num_heads: 4
+  drop_path_rate: 0.0
+
+loss:
+  weight_charbonnier: 0.60
+  weight_ssim: 0.25
+  weight_fft: 0.15
+
+train:
+  epochs: 2
+  lr: 2.0e-4
+  min_lr: 1.0e-6
+  warmup_epochs: 1
+  weight_decay: 1.0e-4
+  gradient_accumulation: 1
+  clip_grad: 1.0

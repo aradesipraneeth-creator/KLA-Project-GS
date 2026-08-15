@@ -1,0 +1,79 @@
+# ============================================================
+# KLA Semiconductor Image Restoration — Git Ignore Rules
+# ============================================================
+
+# Official Proprietary KLA Dataset (Strictly Excluded)
+Train/
+train/
+Test_NoisyLR/
+test_noisylr/
+NoisyLR/
+Noisy_LR/
+GT/
+gt/
+*.npy
+*.npz
+
+# macOS Metadata & Resource Forks
+__MACOSX/
+._*
+.DS_Store
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE & Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Training Outputs, Checkpoints & Model Weights
+outputs/
+checkpoints/
+results/
+validation_results/
+*.pth
+*.pt
+*.ckpt
+*.onnx
+*.safetensors
+*.bin
+
+# Log Files & Scratch
+*.log
+logs/
+scratch/
+
+# Secrets, Credentials & Environment Configurations
+.env
+.env.*
+*.key
+*.pem
+*.cert
+*.secret
+credentials.json
+*.token
+
+# Temporary & Cache Files
+*.tmp
+*.temp
+temp/
+tmp/

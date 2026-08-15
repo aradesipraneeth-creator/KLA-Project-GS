@@ -1,0 +1,58 @@
+# KLA Semiconductor Image Restoration — Canonical V2 Configuration
+project_name: "KLA_Semiconductor_Restoration_V2"
+model_version: "KLA-HYBRID-V2"
+device: "cuda"
+amp: true
+use_ema: true
+ema_decay: 0.999
+
+output_dir: "./outputs/v2"
+checkpoint_dir: "./outputs/v2/checkpoints"
+val_results_dir: "./outputs/v2/results"
+visual_diagnostics_dir: "./outputs/v2/visual_diagnostics"
+
+data:
+  lq_train_dir: null  # Auto-resolved (handles Train/train, NoisyLR/Noisy_LR)
+  gt_train_dir: null  # Auto-resolved (handles Train/train, GT/gt)
+  lq_test_dir: null   # Auto-resolved (handles Test_NoisyLR/NoisyLR)
+  val_ratio: 0.1      # 10% validation = 320 samples, 90% train = 2880 samples
+  seed: 42
+  batch_size: 32
+  num_workers: 4
+  patch_size_lq: null # Full 128x128 image training
+  cache_in_memory: true
+
+model:
+  in_channels: 1
+  out_channels: 1
+  scale: 2
+  base_dim: 32
+  num_groups: 6
+  naf_blocks_per_group: 6
+  swin_blocks_per_group: 2
+  window_size: 8
+  swin_heads: 4
+  naf_expansion: 2
+  drop_path_rate: 0.0
+  use_frequency_guidance: false
+
+loss:
+  weight_charbonnier: 0.60
+  weight_ssim: 0.25
+  weight_fft: 0.15
+  charbonnier_eps: 1.0e-3
+  ssim_window_size: 11
+  curriculum_epochs: 2  # Warmup stage (epochs 1-2) before full compound loss
+  curriculum_warmup_charbonnier: 0.80
+  curriculum_warmup_ssim: 0.15
+  curriculum_warmup_fft: 0.05
+
+train:
+  epochs: 30
+  lr: 2.0e-4
+  min_lr: 1.0e-6
+  warmup_epochs: 2
+  val_interval: 1      # Full validation & EMA tracking every epoch
+  weight_decay: 1.0e-4
+  gradient_accumulation: 1
+  clip_grad: 1.0
