@@ -17,7 +17,7 @@ data:
   lq_test_dir: null   # Auto-resolved (handles Test_NoisyLR/NoisyLR)
   val_ratio: 0.1      # 10% validation = 320 samples, 90% train = 2880 samples
   seed: 42
-  batch_size: 32
+  batch_size: 16
   num_workers: 4
   patch_size_lq: null # Full 128x128 image training
   cache_in_memory: true
@@ -54,5 +54,5 @@ train:
   warmup_epochs: 2
   val_interval: 1      # Full validation & EMA tracking every epoch
   weight_decay: 1.0e-4
-  gradient_accumulation: 1
+  gradient_accumulation: 2
   clip_grad: 1.0

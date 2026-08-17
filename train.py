@@ -7,8 +7,13 @@ Remote GPU execution command:
 """
 
 import argparse
+import os
 from pathlib import Path
 import yaml
+
+# Optimize CUDA allocator to prevent OOM from fragmentation on shared DGX/GPU environments
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
+
 import torch
 
 from trainer.trainer import Trainer
@@ -43,7 +48,13 @@ def parse_args():
         "--batch_size",
         type=int,
         default=None,
-        help="Override batch size (e.g. --batch_size 64)",
+        help="Override batch size (e.g. --batch_size 16)",
+    )
+    parser.add_argument(
+        "--grad_accum",
+        type=int,
+        default=None,
+        help="Override gradient accumulation steps (e.g. --grad_accum 2)",
     )
     parser.add_argument(
         "--val_interval",
@@ -81,6 +92,11 @@ def main():
         if "data" not in config:
             config["data"] = {}
         config["data"]["batch_size"] = args.batch_size
+
+    if args.grad_accum is not None:
+        if "train" not in config:
+            config["train"] = {}
+        config["train"]["gradient_accumulation"] = args.grad_accum
 
     if args.val_interval is not None:
         if "train" not in config:

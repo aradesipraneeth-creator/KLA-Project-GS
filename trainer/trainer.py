@@ -104,6 +104,9 @@ class Trainer:
         else:
             self.device = torch.device("cpu")
 
+        if self.device.type == "cuda" and torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
         # 2. Output and Checkpoint Directories (outputs/v2)
         self.output_dir = Path(config.get("output_dir", "./outputs/v2"))
         self.checkpoint_dir = Path(config.get("checkpoint_dir", "./outputs/v2/checkpoints"))
@@ -249,7 +252,7 @@ class Trainer:
 
         val_ratio = safe_float(data_cfg.get("val_ratio", 0.1), default=0.1)
         seed = safe_int(data_cfg.get("seed", 42), default=42)
-        self.batch_size = 2 if self.dev_mode else safe_int(data_cfg.get("batch_size", 32), default=32)
+        self.batch_size = 2 if self.dev_mode else safe_int(data_cfg.get("batch_size", 16), default=16)
         num_workers = 0 if (self.dev_mode or os.name == "nt") else safe_int(data_cfg.get("num_workers", 4), default=4)
         cache_mem = bool(data_cfg.get("cache_in_memory", True)) and not self.dev_mode
         pin_memory = bool(data_cfg.get("pin_memory", True)) and (self.device.type == "cuda")
@@ -286,7 +289,7 @@ class Trainer:
         )
         self.val_loader = DataLoader(
             val_ds,
-            batch_size=1 if self.dev_mode else min(32, len(val_ds)),
+            batch_size=1 if self.dev_mode else min(16, len(val_ds)),
             shuffle=False,
             num_workers=num_workers,
             pin_memory=pin_memory,
@@ -336,7 +339,7 @@ class Trainer:
         else:
             current_lr = self.optimizer.param_groups[0]["lr"]
 
-        self.optimizer.zero_grad()
+        self.optimizer.zero_grad(set_to_none=True)
 
         for step, batch in enumerate(self.train_loader, 1):
             lq = batch["lq"].to(self.device, non_blocking=True)
@@ -364,7 +367,7 @@ class Trainer:
                         torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.clip_grad)
                     self.optimizer.step()
 
-                self.optimizer.zero_grad()
+                self.optimizer.zero_grad(set_to_none=True)
 
                 if self.ema is not None:
                     self.ema.update(self.model)
